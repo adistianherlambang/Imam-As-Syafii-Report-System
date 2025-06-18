@@ -61,11 +61,11 @@ function App() {
       if (file) {
         form.append('image', file);
       }
-      const res = await fetch('http://localhost:3000/', {
-        method: 'POST',
-        body: form
-      });
-      const result = await res.json();
+      // const res = await fetch('http://localhost:3000/', {
+      //   method: 'POST',
+      //   body: form
+      // });
+      // const result = await res.json();
       // alert(result.message);
       setIsSubmitted(true);
     } catch (err) {
