@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef} from 'react';
 import './App.css';
 import CustomSelect from './CustomSelect';
 
@@ -66,7 +66,7 @@ function App() {
         body: form
       });
       const result = await res.json();
-      alert(result.message);
+      // alert(result.message);
       setIsSubmitted(true);
     } catch (err) {
       console.error('Gagal mengirim pengaduan:', err);
@@ -97,7 +97,7 @@ function App() {
               name="option"
               value={formData.option}
               onChange={(value) => handleSelectChange("option", value)}
-              options={["Pelanggaran", "Saran", "Lainnya"]}
+              options={["Fasilitas dan Sarpras", "Disiplin Pegawai", "Sistem Pendidikan"]}
               placeholder="Pilih jenis pengaduan"
             />
           </div>
