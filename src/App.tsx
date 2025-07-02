@@ -1,6 +1,7 @@
 import { useState, useRef} from 'react';
 import './App.css';
 import CustomSelect from './CustomSelect';
+import imageCompression from 'browser-image-compression';
 
 function App() {
   const [formData, setFormData] = useState({
@@ -31,19 +32,51 @@ function App() {
     });
   };
 
-  const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [isCompressing, setIsCompressing] = useState(false);
+
+  const handleImagePreview = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      const imageUrl = URL.createObjectURL(file);
-      setImagePreview(imageUrl);
-      // setFileName(file.name);
-      setFile(file);
+      try {
+        setIsCompressing(true); // mulai loading
+
+        const compressedFile = await imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        });
+
+        const imageUrl = URL.createObjectURL(compressedFile);
+
+        setImagePreview(imageUrl);
+        setFile(compressedFile);
+      } catch (error) {
+        console.error('Gagal mengompres gambar:', error);
+        setImagePreview(null);
+        setFile(null);
+      } finally {
+        setIsCompressing(false); // selesai loading
+      }
     } else {
       setImagePreview(null);
-      // setFileName('');
       setFile(null);
     }
   };
+
+
+  // const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (file && file.type.startsWith('image/')) {
+  //     const imageUrl = URL.createObjectURL(file);
+  //     setImagePreview(imageUrl);
+  //     // setFileName(file.name);
+  //     setFile(file);
+  //   } else {
+  //     setImagePreview(null);
+  //     // setFileName('');
+  //     setFile(null);
+  //   }
+  // };
 
   const imgRef = useRef<HTMLInputElement | null>(null);
 
@@ -61,10 +94,11 @@ function App() {
       if (file) {
         form.append('image', file);
       }
-      // const res = await fetch('http://localhost:3000/', {
-      //   method: 'POST',
-      //   body: form
-      // });
+      const res = await fetch('https://report.assunnahlampung.com/', {
+        method: 'POST',
+        body: form
+      });
+      await res.json();
       // const result = await res.json();
       // alert(result.message);
       setIsSubmitted(true);
@@ -111,7 +145,11 @@ function App() {
           </div>
           <div className='inputContainer'>
             <label>Upload Foto<span style={{color: "red"}}>*</span></label>
-            {imagePreview ? (
+            {isCompressing ? (
+              <div className="input imgContainer">
+                <p style={{ fontSize: '0.75rem', opacity: 0.7 }}>Memuat gambar...</p>
+              </div>
+            ) : imagePreview ? (
               <div className='input imgContainer'>
                 <img
                   className='img'
